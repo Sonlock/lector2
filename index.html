@@ -5,24 +5,23 @@
     <title>Lector de códigos de barras y QR</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-      body {
+
+      html, body {
+        height: 100%;
         margin: 0;
         padding: 0;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
       }
       #camera {
-        width: 100%;
-        height: calc(100% - 110px);
-        padding: 0;
-        margin: 0;
-      }
+  width: 100%;
+  height: calc(100% * 9 / 16);
+  object-fit: fill;
+}
+
+
       #resultado {
         width: 100%;
         padding: 10px;
+        margin: 10px;
         box-sizing: border-box;
         font-size: 1.2em;
         margin-top: 10px;
@@ -32,16 +31,15 @@
       .btn {
         display: block;
         width: 100%;
-        padding: 10px;
+        padding: 20px;
         box-sizing: border-box;
         font-size: 1.2em;
         background-color: #008CBA;
         color: #fff;
         border: none;
         border-radius: 5px;
-        margin-top: 10px;
-        position: fixed;
-        bottom: 0;
+        margin-top: 20px;
+        margin: 10px;
       }
     </style>
   </head>
@@ -70,13 +68,7 @@
           inputStream: {
             name: "Live",
             type: "LiveStream",
-            target: document.querySelector("#camera"),
-            constraints: {
-              width: { min: 640 },
-              height: { min: 480 },
-              facingMode: "environment",
-              aspectRatio: { min: 1, max: 2 }
-            }
+            target: document.querySelector("#camera")
           },
           decoder: {
             readers: ["ean_reader", "qr_reader"]
@@ -84,20 +76,13 @@
           locator: {
             patchSize: "medium",
             halfSample: true
-          },
-          numOfWorkers: navigator.hardwareConcurrency || 4,
-          frequency: 10,
-          debug: false,
-          autoEnableScan: true,
+          }
         }, function(err) {
             if (err) {
                 console.log(err);
                 return;
             }
             Quagga.start();
-            Quagga.CameraAccess.getActiveStream().getVideoTracks()[0].applyConstraints({
-              advanced: [{ autoFocus: true }]
-            });
         });
         Quagga.onDetected(function(result) {
           document.getElementById("resultado").value = result.codeResult.code;
