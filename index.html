@@ -5,14 +5,16 @@
     <title>Lector de códigos de barras y QR</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-      body {
+      html, body {
+        height: 100%;
         margin: 0;
         padding: 0;
       }
       #camera {
         width: 100%;
-        height: auto;
+        height: 100%;
         padding: 0 10px;
+        object-fit: cover;
       }
       #resultado {
         width: 100%;
@@ -41,7 +43,6 @@
     <div id="camera"></div>
     <input type="text" id="resultado" readonly>
     <button class="btn" onclick="scan()">Escanear código</button>
-    <button class="btn" onclick="toggleFlash()">Flash</button>
     <button class="btn" onclick="stopCamera()">Salir</button>
     <script src="https://cdn.jsdelivr.net/npm/quagga/dist/quagga.min.js"></script>
     <script>
@@ -52,11 +53,6 @@
         let buttons = document.querySelectorAll('.btn');
         buttons.forEach(button => button.style.display = 'none');
       };
-
-      let toggleFlash = () => {
-        let state = Quagga.CameraAccess.getActiveStream().getVideoTracks()[0].getCapabilities().torch;
-        Quagga.CameraAccess.getActiveStream().getVideoTracks()[0].applyConstraints({advanced: [{torch: !state}]});
-      }
 
       function scan() {
         let camera = document.querySelector('#camera');
