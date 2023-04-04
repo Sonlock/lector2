@@ -12,6 +12,7 @@
       #camera {
         width: 100%;
         height: auto;
+        padding: 0 10px;
       }
       #resultado {
         width: 100%;
@@ -22,7 +23,7 @@
         border: 1px solid #ccc;
         border-radius: 5px;
       }
-      button {
+      .btn {
         display: block;
         width: 100%;
         padding: 10px;
@@ -39,10 +40,30 @@
   <body>
     <div id="camera"></div>
     <input type="text" id="resultado" readonly>
-    <button onclick="scan()">Escanear código</button>
+    <button class="btn" onclick="scan()">Escanear código</button>
+    <button class="btn" onclick="toggleFlash()">Flash</button>
+    <button class="btn" onclick="stopCamera()">Salir</button>
     <script src="https://cdn.jsdelivr.net/npm/quagga/dist/quagga.min.js"></script>
     <script>
+      let stopCamera = () => {
+        Quagga.stop();
+        let camera = document.querySelector('#camera');
+        camera.style.display = 'none';
+        let buttons = document.querySelectorAll('.btn');
+        buttons.forEach(button => button.style.display = 'none');
+      };
+
+      let toggleFlash = () => {
+        let state = Quagga.CameraAccess.getActiveStream().getVideoTracks()[0].getCapabilities().torch;
+        Quagga.CameraAccess.getActiveStream().getVideoTracks()[0].applyConstraints({advanced: [{torch: !state}]});
+      }
+
       function scan() {
+        let camera = document.querySelector('#camera');
+        camera.style.display = 'block';
+        let buttons = document.querySelectorAll('.btn');
+        buttons.forEach(button => button.style.display = 'block');
+        
         Quagga.init({
           inputStream: {
             name: "Live",
