@@ -3,65 +3,67 @@
   <head>
     <meta charset="UTF-8">
     <title>Lector de códigos de barras y QR</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      #camera {
+        width: 100%;
+        height: auto;
+      }
+      #resultado {
+        width: 100%;
+        padding: 10px;
+        box-sizing: border-box;
+        font-size: 1.2em;
+        margin-top: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      button {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        box-sizing: border-box;
+        font-size: 1.2em;
+        background-color: #008CBA;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        margin-top: 10px;
+      }
+    </style>
   </head>
   <body>
-    <button onclick="scan()">Escanear</button>
-    <br>
+    <div id="camera"></div>
     <input type="text" id="resultado" readonly>
+    <button onclick="scan()">Escanear código</button>
     <script src="https://cdn.jsdelivr.net/npm/quagga/dist/quagga.min.js"></script>
     <script>
       function scan() {
-        navigator.mediaDevices.getUserMedia({
-          audio: false,
-          video: {
-            facingMode: "environment"    // acceder a la cámara trasera del dispositivo
+        Quagga.init({
+          inputStream: {
+            name: "Live",
+            type: "LiveStream",
+            target: document.querySelector("#camera")
+          },
+          decoder: {
+            readers: ["ean_reader", "qr_reader"]
           }
-        }).then(function(stream) {
-          document.querySelector("#camera").srcObject = stream;    // mostrar la vista previa de la cámara en un elemento HTML
-          Quagga.init({
-            inputStream: {
-              name: "Live",
-              type: "LiveStream",
-              target: document.querySelector("#camera")    // elemento HTML para mostrar la vista previa de la cámara
-            },
-            decoder: {
-              readers: ["ean_reader", "qr_reader"]    // tipos de códigos a escanear
+        }, function(err) {
+            if (err) {
+                console.log(err);
+                return;
             }
-          }, function(err) {
-              if (err) {
-                  console.log(err);
-                  return;
-              }
-              Quagga.start();    // iniciar el escaneo
-          });
-          Quagga.onDetected(function(result) {
-            document.getElementById("resultado").value = result.codeResult.code;
-            Quagga.stop();    // detener el escaneo después de que se ha leído un código
-          });
-        }).catch(function(err) {
-          console.log(err);
+            Quagga.start();
         });
-        // detectar la posición del dispositivo
-        window.addEventListener("deviceorientation", function(event) {
-          var alpha = event.alpha;    // obtener el ángulo de la brújula
-          if (alpha !== null) {
-            if (alpha >= 45 && alpha <= 135) {
-              // dispositivo en posición horizontal
-              document.querySelector("#camera").style.transform
-          = "rotate(90deg)";    // girar la vista previa de la cámara 90 grados
-        } else {
-          // dispositivo en posición vertical
-          document.querySelector("#camera").style.transform = "rotate(0deg)";
-        }
+        Quagga.onDetected(function(result) {
+          document.getElementById("resultado").value = result.codeResult.code;
+          Quagga.stop();
+        });
       }
-    }, false);
-  }
-</script>
-<style>
-  #camera {
-    width: 100%;
-    height: auto;
-    transform-origin: top left;
-  }
-</style>
-<video id="camera"></video>
+    </script>
+  </body>
+</html>
